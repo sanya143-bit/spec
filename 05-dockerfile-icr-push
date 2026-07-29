@@ -1,8 +1,0 @@
-@sanya143-bit ➜ /workspaces/spec (main) $ docker tag my-web-app us.icr.io/my-namespace/my-web-app:latest
-@sanya143-bit ➜ /workspaces/spec (main) $ docker push us.icr.io/my-namespace/my-web-app:latest
-The push refers to repository [us.icr.io/my-namespace/my-web-app:latest]
-b2d338f1e5bb: Pushed 
-cacfcdd01f30: Pushed 
-062e450697fa: Pushed 
-b6698f04e005: Pushed 
-latest: digest: sha256:bbd131eaa336d84acf272cf9f99f662a8db9b254db4ca4a55aa276d0064b26a2 size: 1362

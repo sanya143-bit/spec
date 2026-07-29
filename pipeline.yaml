@@ -1,27 +1,23 @@
 apiVersion: tekton.dev/v1beta1
-kind: Task
+kind: Pipeline
 metadata:
-  name: npm-install
+  name: web-app-pipeline
 spec:
   workspaces:
-    - name: source
-  steps:
-    - name: install
-      image: node:18
-      workingDir: $(workspaces.source.path)
-      script: |
-        npm install
+    - name: shared-workspace
+  tasks:
+    - name: run-npm-install
+      taskRef:
+        name: npm-install
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+    - name: run-jasmine-test
+      taskRef:
+        name: jasmine-test
+      runAfter:
+        - run-npm-install
+      workspaces:
+        - name: source
+          workspace: shared-workspace
 ---
-apiVersion: tekton.dev/v1beta1
-kind: Task
-metadata:
-  name: jasmine-test
-spec:
-  workspaces:
-    - name: source
-  steps:
-    - name: test
-      image: node:18
-      workingDir: $(workspaces.source.path)
-      script: |
-        npx jasmine spec/taxSpace.spec.js
