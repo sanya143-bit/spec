@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: web-app-pipeline
+  name: tax-calculator-pipeline
 spec:
   workspaces:
     - name: shared-workspace
@@ -20,4 +20,3 @@ spec:
       workspaces:
         - name: source
           workspace: shared-workspace
----
