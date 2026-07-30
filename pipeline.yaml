@@ -1,22 +1,68 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: tax-calculator-pipeline
+  name: juphc-tc-pipeline
 spec:
   workspaces:
-    - name: shared-workspace
+    - name: pipeline-workspace
+    - name: dockerconfig-ws
+  params:
+    - name: build-image
+    - name: repo-url
+    - name: branch
+      default: main
   tasks:
-    - name: run-npm-install
-      taskRef:
-        name: npm-install
+    - name: init
       workspaces:
         - name: source
-          workspace: shared-workspace
-    - name: run-jasmine-test
+          workspace: pipeline-workspace
       taskRef:
-        name: jasmine-test
+        name: cleanup
+
+    - name: clone
+      workspaces:
+        - name: output
+          workspace: pipeline-workspace
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.branch)
       runAfter:
-        - run-npm-install
+        - init
+
+    - name: npminstall
       workspaces:
         - name: source
-          workspace: shared-workspace
+          workspace: pipeline-workspace
+      taskRef:
+        name: npm
+      runAfter:
+        - clone
+
+    - name: tests
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+      taskRef:
+        name: jasmine
+      runAfter:
+        - npminstall
+
+    - name: build
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+        - name: dockerconfig-ws
+          workspace: dockerconfig-ws
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      params:
+        - name: IMAGE
+          value: $(params.build-image)
+      runAfter:
+        - tests
